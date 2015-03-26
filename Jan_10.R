@@ -48,12 +48,68 @@ m1$set(pointSize = 0, lineWidth = 1)
 m1
 
 
+#calculate the real citation value of the selected year
+
+cry <- function(data,year,theta = 1,m = 35){
+        data <- data[!is.na(data[,"py"]),] #delete the data that have no pulication years
+        year <- as.numeric(year)
+        if(year < min(as.numeric(data[,"py"]),na.rm = TRUE)) {
+                stop("Invalid year:too small!")
+                
+        }
+        ydata <- subset(data, py <= year) # find the necessary articles
+        n1 <- dim(ydata)[1] #find number of articles
+        n2 <- dim(ydata)[2] # number of columns
+        h <- vector() #storage the citation of each paper
+        for (i in 1:n1){
+                puby <- as.numeric(ydata[i,"py"])
+                h[i] <- sum(ydata[i,(122-(2015-puby)):(122-(2015-year))],na.rm = TRUE)    # count number of citaitons till this year            
+        }
+        
+        cdata <- NULL
+        cdata$rc <- round(sum(log((3*h/m)^theta+1)),3)
+        cdata$ct <- n1 #ordinary citation
+        as.data.frame(cdata)
+}
+# m represents the average citations in a research area
+
+#But often review has much more citations than ordinary #research articles
+
+twocit <- function(data,theta = 1, m = 35){
+        data <- data[!is.na(data[,"py"]),] #delete the data that have no pulication years
+        miny <- min(as.numeric(data[,"py"]),na.rm = TRUE)
+        xa <- NULL
+        for (year in miny:2014){
+                xa <- rbind(xa,cry(data,year,theta,m))          
+        }
+        
+        xa$year <- 1:(2014-min(as.numeric(data[,"py"]))+1)
+        xa
+}
+
+x <- 1:14
+y <- c(8,50,57,76,56,84,63,64,56,63,40,62,40,44)
+z <- vector()
+for (i in 1:14) {
+        z[i] <- sum(y[1:i])
+}
+fit <- nls(z ~ 40 * (exp(a1 * (pnorm((log(x)-a2)/a3))-1)),start = list(a1=3,a2=3,a3=2))
+
+mcmodel <- function(x,y,m = 35,data,lambda = 2,mu = 2,sigma = 2){
+        fit <- nls(y ~ m * (exp(lambda * (pnorm((log(x)-mu)/sigma))-1)),start = list(lambda=lambda,mu=mu,sigma=sigma))
+        fit
+}
 
 
 
+#the derivative of the citation dynamyics model
+
+deriv(~ 35*(exp(lambda * (pnorm((log(year) - mu)/sigma)) - 1)),
+      c('lambda','mu','sigma'),#function(lambda,mu,sigma,year){}
+      )
 
 
-
+#the fit model with regularization
 
 
 

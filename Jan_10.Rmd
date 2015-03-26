@@ -12,8 +12,7 @@ When you click the **Knit** button a document will be generated that includes bo
 
 **What is real citation?**
 
-Typically, knowledge is spreading by means of **citations**. The more citations 
-an article earns, the lagrer scientific impact it exerts. But knowledge is not equally expanded by all its citing papers. Some of them may be highly cited, while others are poor. So when we are trying to measure the scientific impact of the articles, we cannot treat the citing papers equally. Then I came up with the idea: Real Citation Index.
+Typically, knowledge is spreading by means of **citations**. The more citations an article earns, the lagrer scientific impact it exerts. But knowledge is not equally expanded by all its citing papers. Some of them may be highly cited, while others are poor. So when we are trying to measure the scientific impact of the articles, we cannot treat the citing papers equally. Then I came up with the idea: Real Citation Index.
 
 Real citation of an article is defined as follows:
 
@@ -110,27 +109,29 @@ As we can see, when $\theta$ gets bigger, the *$C_{R}$* will gets closer to the 
 We should collect a series of papers ,their citations should vary from 10,20,30,50,80,100,200,500,700,1000,1500,2000,3000.
 Then we should choose a series of $\theta$ to compare *$c_{0}$* and *$C_{R}$*.
 
-#```{r}
+
+library(xlsx)
 d2389 <- read.xlsx2("2389.xlsx",1,startRow = 1, endRow = 2390,colClasses = c(rep("character",6),"Date","numeric",rep("character",11),rep("numeric",118)))
 
-##d2389 <- read.xlsx2("2389.xlsx",1,startRow = 1, endRow = 2390)
-#```
+d2389 <- read.xlsx2("2389.xlsx",1,startRow = 1, endRow = 2390)
+
 
 Then I tried that when there are a lot of citing articles with very low citations will result in a very low *$C_{R}$*. So I have to remove part of the data.First I should draw a picture to decide from which year(publication age) the data should be removed.
 
 ```{r}
-d2389 <- d2389[,c(1,2,6,8,20:137)]
-colnames(d2389) <- c("ti","au","so","py","tc","avc",1900:2015)
-table(d2389$py)
-d2389 <- d2389[c(1:6,115:122)]
-d2008 <- subset(d2389, py == 2008)# publication year == 2008
-d2008 <- d2008[7:14, ]
-
-dd2008 <- data.frame(year = NA, d2008) #plus year as avaraible
-d2008$year <-as.numeric(rownames(d2008))
-m1 <- mPlot(x = 2008:2015, y = d2008[,1:5],data = d2008)
-
+library(rCharts)
+# d2389 <- d2389[,c(1,2,6,8,20:137)]
+# colnames(d2389) <- c("ti","au","so","py","tc","avc",1900:2015)
+# table(d2389$py)
+# d2389 <- d2389[c(1:6,115:122)]
+# d2008 <- subset(d2389, py == 2008)# publication year == 2008
+# d2008 <- d2008[7:14, ]
+# 
+# dd2008 <- data.frame(year = NA, d2008) #plus year as avaraible
+# d2008$year <-as.numeric(rownames(d2008))
+# m1 <- mPlot(x = 2008:2015, y = d2008[,1:5],data = d2008)
 ```
+
 
 ## 疑问
 1.很明显，对于不同的文献来说，他们达到最大引用以及后续的趋势不一样。
@@ -226,17 +227,5 @@ twocit <- function(data,theta = 1, m = 35){
 
 ```
 
-
-```{r}
-summary(cars)
-```
-
-You can also embed plots, for example:
-
-```{r, echo=FALSE}
-plot(cars)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 
